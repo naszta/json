@@ -35,8 +35,8 @@ using nlohmann::json;
 
 #include <array>
 #include <map>
-#include <string>
 #include <memory>
+#include <string>
 
 namespace udt
 {

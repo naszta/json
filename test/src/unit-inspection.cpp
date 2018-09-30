@@ -29,9 +29,11 @@ SOFTWARE.
 
 #include "catch.hpp"
 
-#include <fstream>
 #include <nlohmann/json.hpp>
 using nlohmann::json;
+
+#include <fstream>
+#include <sstream>
 
 TEST_CASE("object inspection")
 {

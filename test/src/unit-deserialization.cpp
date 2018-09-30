@@ -33,6 +33,7 @@ SOFTWARE.
 using nlohmann::json;
 
 #include <iostream>
+#include <sstream>
 #include <valarray>
 
 struct SaxEventLogger : public nlohmann::json_sax<json>
@@ -265,7 +266,7 @@ TEST_CASE("deserialization")
             ss3 << "[\"foo\",1,2,3,false,{\"one\":1}";
             ss4 << "[\"foo\",1,2,3,false,{\"one\":1}";
             ss5 << "[\"foo\",1,2,3,false,{\"one\":1}";
-            CHECK_THROWS_AS(json::parse(ss1), json::parse_error&);
+            CHECK_THROWS_AS(json::parse(ss1), json::parse_error);
             CHECK_THROWS_WITH(json::parse(ss2),
                               "[json.exception.parse_error.101] parse error at 29: syntax error - unexpected end of input; expected ']'");
             CHECK(not json::accept(ss3));
@@ -289,7 +290,7 @@ TEST_CASE("deserialization")
         SECTION("string")
         {
             json::string_t s = "[\"foo\",1,2,3,false,{\"one\":1}";
-            CHECK_THROWS_AS(json::parse(s), json::parse_error&);
+            CHECK_THROWS_AS(json::parse(s), json::parse_error);
             CHECK_THROWS_WITH(json::parse(s),
                               "[json.exception.parse_error.101] parse error at 29: syntax error - unexpected end of input; expected ']'");
             CHECK(not json::accept(s));
@@ -316,7 +317,7 @@ TEST_CASE("deserialization")
             ss1 << "[\"foo\",1,2,3,false,{\"one\":1}";
             ss2 << "[\"foo\",1,2,3,false,{\"one\":1}";
             json j;
-            CHECK_THROWS_AS(j << ss1, json::parse_error&);
+            CHECK_THROWS_AS(j << ss1, json::parse_error);
             CHECK_THROWS_WITH(j << ss2,
                               "[json.exception.parse_error.101] parse error at 29: syntax error - unexpected end of input; expected ']'");
         }
@@ -327,14 +328,14 @@ TEST_CASE("deserialization")
             ss1 << "[\"foo\",1,2,3,false,{\"one\":1}";
             ss2 << "[\"foo\",1,2,3,false,{\"one\":1}";
             json j;
-            CHECK_THROWS_AS(ss1 >> j, json::parse_error&);
+            CHECK_THROWS_AS(ss1 >> j, json::parse_error);
             CHECK_THROWS_WITH(ss2 >> j,
                               "[json.exception.parse_error.101] parse error at 29: syntax error - unexpected end of input; expected ']'");
         }
 
         SECTION("user-defined string literal")
         {
-            CHECK_THROWS_AS("[\"foo\",1,2,3,false,{\"one\":1}"_json, json::parse_error&);
+            CHECK_THROWS_AS("[\"foo\",1,2,3,false,{\"one\":1}"_json, json::parse_error);
             CHECK_THROWS_WITH("[\"foo\",1,2,3,false,{\"one\":1}"_json,
                               "[json.exception.parse_error.101] parse error at 29: syntax error - unexpected end of input; expected ']'");
         }
@@ -426,7 +427,7 @@ TEST_CASE("deserialization")
             SECTION("empty container")
             {
                 std::vector<uint8_t> v;
-                CHECK_THROWS_AS(json::parse(v), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(v), json::parse_error);
                 CHECK(not json::accept(v));
 
                 SaxEventLogger l;
@@ -514,7 +515,7 @@ TEST_CASE("deserialization")
             SECTION("with empty range")
             {
                 std::vector<uint8_t> v;
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 SaxEventLogger l;
@@ -530,7 +531,7 @@ TEST_CASE("deserialization")
             SECTION("case 1")
             {
                 uint8_t v[] = {'\"', 'a', 'a', 'a', 'a', 'a', 'a', '\\', 'u'};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 json j_error;
@@ -546,7 +547,7 @@ TEST_CASE("deserialization")
             SECTION("case 2")
             {
                 uint8_t v[] = {'\"', 'a', 'a', 'a', 'a', 'a', 'a', '\\', 'u', '1'};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 json j_error;
@@ -562,7 +563,7 @@ TEST_CASE("deserialization")
             SECTION("case 3")
             {
                 uint8_t v[] = {'\"', 'a', 'a', 'a', 'a', 'a', 'a', '\\', 'u', '1', '1', '1', '1', '1', '1', '1', '1'};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 json j_error;
@@ -578,7 +579,7 @@ TEST_CASE("deserialization")
             SECTION("case 4")
             {
                 uint8_t v[] = {'\"', 'a', 'a', 'a', 'a', 'a', 'a', 'u', '1', '1', '1', '1', '1', '1', '1', '1', '\\'};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 json j_error;
@@ -594,7 +595,7 @@ TEST_CASE("deserialization")
             SECTION("case 5")
             {
                 uint8_t v[] = {'\"', 0x7F, 0xC1};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 json j_error;
@@ -610,7 +611,7 @@ TEST_CASE("deserialization")
             SECTION("case 6")
             {
                 uint8_t v[] = {'\"', 0x7F, 0xDF, 0x7F};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK_THROWS_WITH(json::parse(std::begin(v), std::end(v)),
                                   "[json.exception.parse_error.101] parse error at 4: syntax error - invalid string: ill-formed UTF-8 byte; last read: '\"\x7f\xdf\x7f'");
                 CHECK(not json::accept(std::begin(v), std::end(v)));
@@ -628,7 +629,7 @@ TEST_CASE("deserialization")
             SECTION("case 7")
             {
                 uint8_t v[] = {'\"', 0x7F, 0xDF, 0xC0};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 json j_error;
@@ -644,7 +645,7 @@ TEST_CASE("deserialization")
             SECTION("case 8")
             {
                 uint8_t v[] = {'\"', 0x7F, 0xE0, 0x9F};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 json j_error;
@@ -660,7 +661,7 @@ TEST_CASE("deserialization")
             SECTION("case 9")
             {
                 uint8_t v[] = {'\"', 0x7F, 0xEF, 0xC0};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 json j_error;
@@ -676,7 +677,7 @@ TEST_CASE("deserialization")
             SECTION("case 10")
             {
                 uint8_t v[] = {'\"', 0x7F, 0xED, 0x7F};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 json j_error;
@@ -692,7 +693,7 @@ TEST_CASE("deserialization")
             SECTION("case 11")
             {
                 uint8_t v[] = {'\"', 0x7F, 0xF0, 0x8F};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 json j_error;
@@ -708,7 +709,7 @@ TEST_CASE("deserialization")
             SECTION("case 12")
             {
                 uint8_t v[] = {'\"', 0x7F, 0xF0, 0xC0};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 json j_error;
@@ -724,7 +725,7 @@ TEST_CASE("deserialization")
             SECTION("case 13")
             {
                 uint8_t v[] = {'\"', 0x7F, 0xF3, 0x7F};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 json j_error;
@@ -740,7 +741,7 @@ TEST_CASE("deserialization")
             SECTION("case 14")
             {
                 uint8_t v[] = {'\"', 0x7F, 0xF3, 0xC0};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 json j_error;
@@ -756,7 +757,7 @@ TEST_CASE("deserialization")
             SECTION("case 15")
             {
                 uint8_t v[] = {'\"', 0x7F, 0xF4, 0x7F};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 json j_error;
@@ -772,7 +773,7 @@ TEST_CASE("deserialization")
             SECTION("case 16")
             {
                 uint8_t v[] = {'{', '\"', '\"', ':', '1', '1'};
-                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error&);
+                CHECK_THROWS_AS(json::parse(std::begin(v), std::end(v)), json::parse_error);
                 CHECK(not json::accept(std::begin(v), std::end(v)));
 
                 json j_error;
@@ -797,11 +798,11 @@ TEST_CASE("deserialization")
 
         SECTION("BOM only")
         {
-            CHECK_THROWS_AS(json::parse(bom), json::parse_error&);
+            CHECK_THROWS_AS(json::parse(bom), json::parse_error);
             CHECK_THROWS_WITH(json::parse(bom),
                               "[json.exception.parse_error.101] parse error at 4: syntax error - unexpected end of input; expected '[', '{', or a literal");
 
-            CHECK_THROWS_AS(json::parse(std::istringstream(bom)), json::parse_error&);
+            CHECK_THROWS_AS(json::parse(std::istringstream(bom)), json::parse_error);
             CHECK_THROWS_WITH(json::parse(std::istringstream(bom)),
                               "[json.exception.parse_error.101] parse error at 4: syntax error - unexpected end of input; expected '[', '{', or a literal");
 
@@ -836,11 +837,11 @@ TEST_CASE("deserialization")
 
         SECTION("2 byte of BOM")
         {
-            CHECK_THROWS_AS(json::parse(bom.substr(0, 2)), json::parse_error&);
+            CHECK_THROWS_AS(json::parse(bom.substr(0, 2)), json::parse_error);
             CHECK_THROWS_WITH(json::parse(bom.substr(0, 2)),
                               "[json.exception.parse_error.101] parse error at 3: syntax error - invalid BOM; must be 0xEF 0xBB 0xBF if given; last read: '\xEF\xBB'");
 
-            CHECK_THROWS_AS(json::parse(std::istringstream(bom.substr(0, 2))), json::parse_error&);
+            CHECK_THROWS_AS(json::parse(std::istringstream(bom.substr(0, 2))), json::parse_error);
             CHECK_THROWS_WITH(json::parse(std::istringstream(bom.substr(0, 2))),
                               "[json.exception.parse_error.101] parse error at 3: syntax error - invalid BOM; must be 0xEF 0xBB 0xBF if given; last read: '\xEF\xBB'");
 
@@ -861,11 +862,11 @@ TEST_CASE("deserialization")
 
         SECTION("1 byte of BOM")
         {
-            CHECK_THROWS_AS(json::parse(bom.substr(0, 1)), json::parse_error&);
+            CHECK_THROWS_AS(json::parse(bom.substr(0, 1)), json::parse_error);
             CHECK_THROWS_WITH(json::parse(bom.substr(0, 1)),
                               "[json.exception.parse_error.101] parse error at 2: syntax error - invalid BOM; must be 0xEF 0xBB 0xBF if given; last read: '\xEF'");
 
-            CHECK_THROWS_AS(json::parse(std::istringstream(bom.substr(0, 1))), json::parse_error&);
+            CHECK_THROWS_AS(json::parse(std::istringstream(bom.substr(0, 1))), json::parse_error);
             CHECK_THROWS_WITH(json::parse(std::istringstream(bom.substr(0, 1))),
                               "[json.exception.parse_error.101] parse error at 2: syntax error - invalid BOM; must be 0xEF 0xBB 0xBF if given; last read: '\xEF'");
 
@@ -921,8 +922,8 @@ TEST_CASE("deserialization")
                         else
                         {
                             // any variation is an error
-                            CHECK_THROWS_AS(json::parse(s + "null"), json::parse_error&);
-                            CHECK_THROWS_AS(json::parse(std::istringstream(s + "null")), json::parse_error&);
+                            CHECK_THROWS_AS(json::parse(s + "null"), json::parse_error);
+                            CHECK_THROWS_AS(json::parse(std::istringstream(s + "null")), json::parse_error);
 
                             SaxEventLogger l;
                             CHECK(not json::sax_parse(s + "null", &l));

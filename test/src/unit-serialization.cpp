@@ -32,6 +32,9 @@ SOFTWARE.
 #include <nlohmann/json.hpp>
 using nlohmann::json;
 
+#include <iomanip>
+#include <sstream>
+
 TEST_CASE("serialization")
 {
     SECTION("operator<<")
