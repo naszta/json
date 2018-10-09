@@ -59,6 +59,7 @@ target_include_directories(
 if (MSVC)
     set(NLOHMANN_ADD_NATVIS TRUE)
     set(NLOHMANN_NATVIS_FILE "nlohmann_json.natvis")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
     target_sources(
         ${NLOHMANN_JSON_TARGET_NAME} 
         INTERFACE 
